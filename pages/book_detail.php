@@ -194,23 +194,24 @@ require_once __DIR__ . '/../includes/header.php';
                     <!-- Reading Progress -->
                     <?php if ($user_book && $user_book->status === 'reading'): ?>
                         <div class="mt-4 space-y-3">
-                            <!-- Update Total Pages (if missing) -->
-                            <?php if (empty($book_details->pages)): ?>
-                                <form method="POST" class="flex items-center space-x-2">
-                                    <input type="number" name="total_pages" placeholder="Total pages"
-                                        class="w-24 border-gray-300 rounded-md text-sm px-2 py-1" required>
-                                    <button type="submit" name="update_total_pages"
-                                        class="px-2 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300">
-                                        Save Total Pages
-                                    </button>
-                                </form>
-                            <?php endif; ?>
+                            <!-- Update Total Pages (always show if user is reading) -->
+                            <form method="POST" class="flex items-center space-x-2">
+                                <label class="text-sm text-gray-600">Total Pages:</label>
+                                <input type="number" name="total_pages" 
+                                    value="<?php echo $book_details->pages ?? ''; ?>"
+                                    class="w-24 border border-gray-300 rounded-md text-sm px-2 py-1 focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent" 
+                                    required>
+                                <button type="submit" name="update_total_pages"
+                                    class="px-2 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300">
+                                    <?php echo empty($book_details->pages) ? 'Save' : 'Update'; ?> Total Pages
+                                </button>
+                            </form>
 
                             <?php if (!empty($book_details->pages)): ?>
                                 <form method="POST" class="flex items-center space-x-2">
                                     <label class="text-sm text-gray-600">Progress:</label>
                                     <input type="number" name="current_page" value="<?php echo $user_book->current_page; ?>"
-                                        class="w-20 border-gray-300 rounded-md text-sm px-2 py-1">
+                                        class="w-20 border border-gray-300 rounded-md text-sm px-2 py-1 focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent">
                                     <span class="text-xs text-gray-500">/ <?php echo $book_details->pages; ?> pages</span>
                                     <button type="submit" name="update_progress"
                                         class="px-2 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300">Update</button>
@@ -235,66 +236,104 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- Description & Review in Same Card -->
-        <div class="p-6 border-t">
-            <h2 class="text-lg font-semibold mb-2">Description</h2>
-            <p class="text-gray-700 leading-relaxed mb-4">
+        <!-- Description & Review Section -->
+        <div class="p-6 border-t border-gray-100">
+            <h2 class="text-xl font-semibold mb-3 text-gray-800">Description</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
                 <?php echo nl2br(htmlspecialchars($book_details->description)); ?>
             </p>
 
             <?php if ($logged_in && $user_book && $user_book->status === 'finished'): ?>
-                <hr class="my-4">
-                <h3 class="text-lg font-semibold mb-3">Your Review</h3>
-                <?php if (!empty($user_book->rating) || !empty($user_book->review)): ?>
-                    <div class="mb-3">
-                        <strong class="text-gray-700">Rating:</strong>
-                        <div class="flex mt-1">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <svg class="w-5 h-5 <?php echo ($i <= $user_book->rating) ? 'text-yellow-400' : 'text-gray-300'; ?>"
-                                    fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.163c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.955c.3.922-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.784.57-1.838-.196-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.17 9.382c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.286-3.955z" />
-                                </svg>
-                            <?php endfor; ?>
-                        </div>
-                    </div>
-                    <?php if (!empty($user_book->review)): ?>
-                        <div class="mb-3">
-                            <strong class="text-gray-700">Review:</strong>
-                            <p class="mt-1 text-gray-600 italic">
-                                <?php echo nl2br(htmlspecialchars($user_book->review)); ?>
-                            </p>
-                        </div>
+                <hr class="my-6 border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Your Review</h3>
+                    <?php if (!empty($user_book->rating) || !empty($user_book->review)): ?>
+                        <button onclick="openEditReviewForm()" 
+                           class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit Review
+                        </button>
                     <?php endif; ?>
-                <?php else: ?>
-                    <form method="POST">
+                </div>
+                
+                <?php if (!empty($user_book->rating) || !empty($user_book->review)): ?>
+                    <div id="reviewDisplay" class="bg-gray-50 p-5 rounded-lg">
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                            <div class="flex flex-row-reverse justify-end space-x-reverse space-x-1">
+                            <p class="text-sm text-gray-600 mb-1">Rating</p>
+                            <div class="flex">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <svg class="w-6 h-6 <?php echo ($i <= $user_book->rating) ? 'text-yellow-400' : 'text-gray-300'; ?>"
+                                        fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.955a1 1 0 00.95.69h4.163c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.955c.3.922-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.784.57-1.838-.196-1.539-1.118l1.287-3.955a1 1 0 00-.364-1.118L2.17 9.382c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.286-3.955z" />
+                                    </svg>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                        <?php if (!empty($user_book->review)): ?>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Thoughts</p>
+                                <p class="text-gray-700">
+                                    <?php echo nl2br(htmlspecialchars($user_book->review)); ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Edit Review Form (Hidden by default) -->
+                <div id="editReviewForm" class="bg-gray-50 p-5 rounded-lg border border-gray-200 <?php echo empty($user_book->rating) && empty($user_book->review) ? '' : 'hidden'; ?>">
+                    <form method="POST">
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                            <div class="flex flex-row-reverse justify-end space-x-reverse space-x-2">
                                 <?php for ($i = 5; $i >= 1; $i--): ?>
                                     <input type="radio" id="star<?php echo $i; ?>" name="rating"
-                                        value="<?php echo $i; ?>" class="hidden peer/star<?php echo $i; ?>" required>
+                                        value="<?php echo $i; ?>" class="hidden peer/star<?php echo $i; ?>" 
+                                        <?php echo ($user_book->rating ?? 0) == $i ? 'checked' : ''; ?> required>
                                     <label for="star<?php echo $i; ?>"
-                                        class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked/star<?php echo $i; ?>:text-yellow-400">
+                                        class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked/star<?php echo $i; ?>:text-yellow-400 text-3xl transition-colors duration-200">
                                         ★
                                     </label>
                                 <?php endfor; ?>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label for="review" class="block text-sm font-medium text-gray-700 mb-1">Review (Optional)</label>
-                            <textarea id="review" name="review" rows="3"
-                                class="w-full rounded-lg border-gray-300 text-sm p-2 focus:ring-2 focus:ring-[var(--accent)]"></textarea>
+                        <div class="mb-5">
+                            <label for="review" class="block text-sm font-medium text-gray-700 mb-2">Review (Optional)</label>
+                            <textarea id="review" name="review" rows="4"
+                                class="w-full rounded-lg border border-gray-300 text-sm p-3 focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent shadow-sm transition duration-200"><?php echo htmlspecialchars($user_book->review ?? ''); ?></textarea>
                         </div>
-                        <button type="submit" name="add_review"
-                            class="bg-[var(--accent)] text-white px-4 py-2 rounded-md hover:opacity-90">
-                            Submit Review
-                        </button>
+                        <div class="flex justify-end space-x-3">
+                            <?php if (!empty($user_book->rating) || !empty($user_book->review)): ?>
+                                <button type="button" onclick="cancelEditReview()"
+                                    class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition duration-200">
+                                    Cancel
+                                </button>
+                            <?php endif; ?>
+                            <button type="submit" name="add_review"
+                                class="px-5 py-2.5 rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                                <?php echo (!empty($user_book->rating) || !empty($user_book->review)) ? 'Update Review' : 'Submit Review'; ?>
+                            </button>
+                        </div>
                     </form>
-                <?php endif; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
+
+<script>
+function openEditReviewForm() {
+    document.getElementById('reviewDisplay').classList.add('hidden');
+    document.getElementById('editReviewForm').classList.remove('hidden');
+}
+
+function cancelEditReview() {
+    document.getElementById('reviewDisplay').classList.remove('hidden');
+    document.getElementById('editReviewForm').classList.add('hidden');
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

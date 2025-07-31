@@ -6,6 +6,8 @@
     <title><?php echo SITE_NAME; ?> | <?php echo $page_title ?? 'Welcome'; ?></title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
@@ -172,5 +174,7 @@
         <?php flash('login_error'); ?>
         <?php flash('book_message'); ?>
         <?php flash('profile_message'); ?>
+
+    
 </body>
 </html>

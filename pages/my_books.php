@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/header.php';
     // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filterDropdown');
-        const filterWrapper = document.querySelector('.relative'); // ✅ Select the wrapper, not just button
+        const filterWrapper = document.querySelector('.relative'); 
 
         if (!filterWrapper.contains(event.target)) {
             dropdown.classList.add('hidden');

@@ -302,5 +302,17 @@ public function updateBook($book_id, $data) {
         return $this->db->execute();
     }
 
+    public function isBookInUse($book_id) {
+    $this->db->query('SELECT COUNT(*) as count FROM user_books WHERE book_id = :book_id');
+    $this->db->bind(':book_id', $book_id);
+    return $this->db->single()->count > 0;
+}
+
+public function deleteBook($book_id) {
+    $this->db->query('DELETE FROM books WHERE id = :book_id');
+    $this->db->bind(':book_id', $book_id);
+    return $this->db->execute();
+}
+
 
 }

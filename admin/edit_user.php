@@ -202,24 +202,67 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <!-- Delete Option -->
                 <?php if($user_data->id != $_SESSION['user_id']): ?>
-                    <hr class="my-6 border-gray-200">
-                    <form method="POST" action="<?php echo SITE_URL; ?>/admin/manage_users.php"
-                          onsubmit="return confirm('Are you sure you want to delete this user?')">
-                        <input type="hidden" name="user_id" value="<?php echo $user_data->id; ?>">
-                        <button type="submit" name="delete_user"
-                            class="w-full mt-2 px-4 py-3 bg-red-50 text-red-600 text-sm rounded-lg hover:bg-red-100 transition">
-                            Delete User
-                        </button>
-                    </form>
+                    <hr class="my-6 border-gray-100">
+                    <button onclick="openDeleteModal()"
+                        class="w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Delete User
+                    </button>
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+</div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Delete User</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">Are you sure you want to delete this user? This action cannot be undone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form method="POST" action="<?php echo SITE_URL; ?>/admin/manage_users.php" class="inline-flex">
+                    <input type="hidden" name="user_id" value="<?php echo $user_data->id; ?>">
+                    <button type="submit" name="delete_user"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Delete
+                    </button>
+                </form>
+                <button type="button" onclick="closeDeleteModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
         <div class="mt-12 text-center text-sm text-gray-500">
             <p>Need help? <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition">Contact support</a></p>
         </div>
     </div>
 </div>
+
+<script>
+function openDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+</script>
 
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
